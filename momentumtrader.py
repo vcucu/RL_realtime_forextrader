@@ -33,26 +33,29 @@ class MomentumTrader(pricing.PricingStream):
         #print(self.df.to_string())
         self.ticks += 1  # 37
         print(self.ticks, end=', ')
-        #print(pd.DataFrame(data,index=[data['time']]).to_string())
+        print(pd.DataFrame(data,index=[data['time']]).to_string())
         # appends the new tick data to the DataFrame object
         self.df = self.df.append(pd.DataFrame(data,
                                  index=[data['time']]))  # 38
         # transforms the time information to a DatetimeIndex object
         self.df.index = pd.DatetimeIndex(self.df['time'])  # 39
-        # resamples the data set to a new, homogeneous interval
-        dfr = self.df.resample('5s').last()  # 40#.pad()
+        # resamples the data set to a new, homogeneous interval, as in aggregates info to every 15 sec
+        dfr = self.df.resample('10s').pad()  # 40#.last()
+        print("df", self.df.to_string())
+        print("dfr", dfr.to_string())
         # calculates the log returns
         dfr['closeoutAsk'] = dfr['closeoutAsk'].astype('float')
         dfr['returns'] = np.log(dfr['closeoutAsk'] / dfr['closeoutAsk'].shift(1))  # 41
         # derives the positioning according to the momentum strategy
-        print("to be signed:", str(dfr['returns'].rolling(
-                                      self.momentum).mean()))
-        print(type(dfr['returns'].rolling(
-                                      self.momentum).mean()))
+        print("mom", self.momentum, "roll", dfr['returns'].rolling(10).mean().to_string())
+        #print("to be signed:", str(dfr['returns'].rolling(
+        #                              self.momentum).mean()))
+        #print(type(dfr['returns'].rolling(
+        #                              self.momentum).mean()))
         print()
         dfr['position'] = np.sign(dfr['returns'].rolling(
                                       self.momentum).mean())  # 42
-        #rint(dfr[-1].to_string())
+        #print(dfr[-1].to_string())
         print("positions ", dfr['position'].iloc[-1], self.position)
         if dfr['position'].iloc[-1] == 1:  # 43
             # go long
@@ -87,7 +90,7 @@ params = {"instruments": "EUR_USD", "timeout": "5"}
 #    print json.dumps(R, indent=4),","
 #        r.terminate('maxrecs records received')
 
-mt = MomentumTrader(momentum=20,accountID=accountID, params=params)
+mt = MomentumTrader(momentum=12,accountID=accountID, params=params)
 rv = client.request(mt)
 for tick in rv:
     #print("tick")
