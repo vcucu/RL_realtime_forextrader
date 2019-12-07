@@ -41,13 +41,16 @@ class MomentumTrader(pricing.PricingStream):
         self.df.index = pd.DatetimeIndex(self.df['time'])  # 39
         # resamples the data set to a new, homogeneous interval, as in aggregates info to every 15 sec
         dfr = self.df.resample('10s').pad()  # 40#.last()
-        print("df", self.df.to_string())
-        print("dfr", dfr.to_string())
+
         # calculates the log returns
         dfr['closeoutAsk'] = dfr['closeoutAsk'].astype('float')
         dfr['returns'] = np.log(dfr['closeoutAsk'] / dfr['closeoutAsk'].shift(1))  # 41
+
+        print("df", self.df.to_string())
+        print("dfr", dfr.to_string())
+
         # derives the positioning according to the momentum strategy
-        print("mom", self.momentum, "roll", dfr['returns'].rolling(10).mean().to_string())
+        #print("mom", self.momentum, "roll", dfr['returns'].rolling(10).mean().to_string())
         #print("to be signed:", str(dfr['returns'].rolling(
         #                              self.momentum).mean()))
         #print(type(dfr['returns'].rolling(
@@ -96,8 +99,3 @@ for tick in rv:
     #print("tick")
     if tick["type"] == "PRICE":
         mt.on_success(tick)
-
-#mt.rates(account_id=config['oanda']['account_id'],
-#         instruments=['DE30_EUR'], ignore_heartbeat=True)
-#mt.rates(account_id=config['oanda']['account_id'],
-#         instruments=['DE30_EUR'], ignore_heartbeat=True)

@@ -1,3 +1,11 @@
+from collections import deque
+import random
+import numpy as np
+from keras.models import Sequential
+from keras.layers import Dense
+from keras.optimizers import Adam
+
+
 # Deep Q-learning Agent
 class DQNAgent:
     def __init__(self, state_size, action_size):
@@ -10,10 +18,11 @@ class DQNAgent:
         self.epsilon_decay = 0.995
         self.learning_rate = 0.001
         self.model = self._build_model()
+
     def _build_model(self):
         # Neural Net for Deep-Q learning Model
         model = Sequential()
-        model.add(Dense(24, input_dim=self.state_size, activation='relu'))
+        model.add(Dense(24, input_dim=self.state_size[0], activation='relu'))
         model.add(Dense(24, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
