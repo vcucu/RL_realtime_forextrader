@@ -27,10 +27,9 @@ class TradingEnv(gym.Env):
 
     # action space
     #self.action_space = spaces.Discrete(3**self.n_stock)
-    self.action_space = 3
+    self.action_space = spaces.Discrete(3)
 
     # observation space: give estimates in order to sample and build scaler
-
     balance_range = np.array((-init_invest * 2, init_invest * 2))
     stock_range = np.array((0, init_invest * 2 // self.stock_price_history['a_c'].max())) #stock owned
     bid_range = np.array((0, self.stock_price_history['a_c'].max()))
@@ -89,7 +88,7 @@ class TradingEnv(gym.Env):
     self._trade(action)
     cur_val = self._get_val()
     reward = cur_val - prev_val
-    done = (self.cur_step == len(self.stock_price_history - 1))
+    done = (self.cur_step == len(self.stock_price_history) - 1)
     info = {'cur_val': cur_val}
     return self._get_obs(), reward, done, info
 
@@ -108,7 +107,7 @@ class TradingEnv(gym.Env):
 
 
   def _get_val(self): #reward function
-    return (self.stock_owned * self.self.bid_close) + self.balance
+    return (self.stock_owned * self.bid_close) + self.balance
 
 
   def _trade(self, action):
