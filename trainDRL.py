@@ -69,8 +69,9 @@ if __name__ == "__main__":
 
         while True:
             state = env.reset()
-            print(state)
+            print("state after reset", state)
             state = np.reshape(state, [1, 14]) #8 because we have 8 dimensions in state definition
+            done = False
             while not done:
 
                 action = agent.act(state) # Decide action

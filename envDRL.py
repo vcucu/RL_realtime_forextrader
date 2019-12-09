@@ -287,7 +287,7 @@ class TradingEnvOanda(gym.Env):
     self.tick_counter = 0
     self.client.request(self.r)
     res = self.r.response
-    print(res)
+    print("response", res)
     self.stock_owned = (float)(res['account']['positionValue']) #If more forex pairs were traded: [0] * self.n_stock
     self.balance = self.init_invest #this will not be taken from the API in order to hide the actual amount
     #update all prices and volume
@@ -357,13 +357,14 @@ class TradingEnvOanda(gym.Env):
     obs.append(self.bid_close_p3)
     obs.append(self.ask_close_p3)
     obs.append(self.volume_p3)
+    return obs
 
   def _get_val(self): #reward function
     return (self.stock_owned * self.bid_close) + self.balance
 
 
   def _trade(self, action):
-    print(action)
+    print("action", action)
     if action == 0: #sell
         #self.balance += self.bid_close * self.stock_owned
         #self.stock_owned = 0
@@ -373,7 +374,7 @@ class TradingEnvOanda(gym.Env):
                 "price": self.bid_close,
                 "stopLossOnFill": {
                   "timeInForce": "GTC",
-                  "price": self.bid_lose
+                  "price": self.bid_close
                 },
                 "timeInForce": "GFD",
                 "instrument": "EUR_USD",
@@ -396,8 +397,8 @@ class TradingEnvOanda(gym.Env):
         #and the exact price is not guaranteed with the market order
         self.balance += self.bid_close * self.stock_owned
         self.stock_owned = 0
-        oc = orders.OrderCreate(accountID, data=data)
-        client.request(self.r)
+        oc = orders.OrderCreate(self.accountID, data=data)
+        self.client.request(self.r)
     elif action == 2: #buy stocks
         if self.balance > (self.ask_close * 100): #if we can buy at least 100 shares
             if (self.order_type == "limit"): #create limit order
@@ -427,5 +428,5 @@ class TradingEnvOanda(gym.Env):
                 }
             self.stock_owned += 100
             self.balance -= self.ask_close *100
-            oc = orders.OrderCreate(accountID, data=data)
-            client.request(r)
+            oc = orders.OrderCreate(self.accountID, data=data)
+            self.client.request(self.r)
