@@ -10,6 +10,7 @@ from keras.optimizers import Adam
 class DQNAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size[0]
+        print("state size", self.state_size)
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
         self.gamma = 0.95    # discount rate
@@ -23,10 +24,12 @@ class DQNAgent:
         # Neural Net for Deep-Q learning Model
         model = Sequential()
         model.add(Dense(24, input_dim=self.state_size, activation='relu'))
+        #model.add(Dense(24, activation='relu'))
         model.add(Dense(24, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss='mse',
                       optimizer=Adam(lr=self.learning_rate))
+        print(model.summary())
         return model
 
     def remember(self, state, action, reward, next_state, done):
