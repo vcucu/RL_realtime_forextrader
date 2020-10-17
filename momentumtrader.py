@@ -1,5 +1,4 @@
 import oandapyV20
-import oandapyV20.endpoints.orders as orders
 import oandapyV20.endpoints.pricing as pricing
 import oandapyV20.endpoints.orders as orders
 from oandapyV20.contrib.requests import MarketOrderRequest
@@ -32,8 +31,8 @@ class MomentumTrader(pricing.PricingStream):
     def on_success(self, data):  # 36
         #print(self.df.to_string())
         self.ticks += 1  # 37
-        print(self.ticks, end=', ')
-        print(pd.DataFrame(data,index=[data['time']]).to_string())
+        #print(self.ticks, end=', ')
+        #print(pd.DataFrame(data,index=[data['time']]).to_string())
         # appends the new tick data to the DataFrame object
         self.df = self.df.append(pd.DataFrame(data,
                                  index=[data['time']]))  # 38
@@ -46,8 +45,8 @@ class MomentumTrader(pricing.PricingStream):
         dfr['closeoutAsk'] = dfr['closeoutAsk'].astype('float')
         dfr['returns'] = np.log(dfr['closeoutAsk'] / dfr['closeoutAsk'].shift(1))  # 41
 
-        print("df", self.df.to_string())
-        print("dfr", dfr.to_string())
+        #print("df", self.df.to_string())
+        #print("dfr", dfr.to_string())
 
         # derives the positioning according to the momentum strategy
         #print("mom", self.momentum, "roll", dfr['returns'].rolling(10).mean().to_string())
@@ -96,6 +95,6 @@ params = {"instruments": "EUR_USD", "timeout": "5"}
 mt = MomentumTrader(momentum=12,accountID=accountID, params=params)
 rv = client.request(mt)
 for tick in rv:
-    #print("tick")
+    print(tick)
     if tick["type"] == "PRICE":
         mt.on_success(tick)

@@ -23,4 +23,3 @@ data = {
 }
 r = orders.OrderCreate(accountID, data=data)
 client.request(r)
-print(r.response)
